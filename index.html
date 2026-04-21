@@ -41,6 +41,7 @@ button{
 .save{ background:#1e3c72; }
 .update{ background:#f39c12; }
 .delete{ background:#c0392b; }
+.danger{ background:#8e0000; }
 
 #msg{
   margin-top:10px;
@@ -63,7 +64,10 @@ button{
 
   <button class="save" onclick="saveData()">إضافة / حفظ</button>
   <button class="update" onclick="updateData()">تعديل الحالة</button>
-  <button class="delete" onclick="deleteData()">حذف الطالب</button>
+  <button class="delete" onclick="deleteData()">حذف طالب</button>
+
+  <!-- زر جديد 🔥 -->
+  <button class="danger" onclick="deleteAll()">مسح كل البيانات</button>
 
   <div id="msg"></div>
 </div>
@@ -78,7 +82,6 @@ import {
   remove
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-// 🔥 Firebase config (بتاعك)
 const firebaseConfig = {
   apiKey: "AIzaSyAt6ctdyQgA6yTO6QZGYyCZltO-ZTMEU5w",
   authDomain: "platform-499ca.firebaseapp.com",
@@ -91,9 +94,8 @@ const db = getDatabase(app);
 
 let msg = document.getElementById("msg");
 
-// ➤ إضافة / حفظ جديد
+// ➤ إضافة
 window.saveData = function(){
-
   let code = document.getElementById("code").value.trim();
   let status = document.getElementById("status").value;
 
@@ -109,9 +111,8 @@ window.saveData = function(){
   msg.innerHTML = "تم الحفظ ✔";
 }
 
-// ➤ تعديل الحالة (تم / لم يتم)
+// ➤ تعديل
 window.updateData = function(){
-
   let code = document.getElementById("code").value.trim();
   let status = document.getElementById("status").value;
 
@@ -127,9 +128,8 @@ window.updateData = function(){
   msg.innerHTML = "تم التعديل ✔";
 }
 
-// ➤ حذف الطالب
+// ➤ حذف طالب
 window.deleteData = function(){
-
   let code = document.getElementById("code").value.trim();
 
   if(!code){
@@ -140,6 +140,18 @@ window.deleteData = function(){
   remove(ref(db, "students/" + code));
 
   msg.innerHTML = "تم الحذف 🗑️";
+}
+
+// 🔥 حذف كل البيانات
+window.deleteAll = function(){
+
+  let confirmDelete = confirm("⚠️ هل أنت متأكد من حذف كل بيانات الطلاب؟");
+
+  if(!confirmDelete) return;
+
+  remove(ref(db, "students"));
+
+  msg.innerHTML = "تم حذف كل البيانات 🚨";
 }
 </script>
 
