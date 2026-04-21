@@ -3,27 +3,82 @@
 <head>
 <meta charset="UTF-8">
 <title>لوحة الأدمن</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  font-family: Arial;
+  background:#2a5298;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  direction:rtl;
+}
+
+.box{
+  background:white;
+  padding:20px;
+  border-radius:12px;
+  width:320px;
+  text-align:center;
+}
+
+input,select,button{
+  width:90%;
+  padding:10px;
+  margin:6px 0;
+  font-size:14px;
+}
+
+button{
+  border:none;
+  color:white;
+  cursor:pointer;
+  border-radius:8px;
+}
+
+.save{ background:#1e3c72; }
+.update{ background:#f39c12; }
+.delete{ background:#c0392b; }
+
+#msg{
+  margin-top:10px;
+  font-weight:bold;
+}
+</style>
 </head>
 
 <body>
 
-<h2>Admin Panel</h2>
+<div class="box">
+  <h3>لوحة تحكم الأدمن</h3>
 
-<input id="code" placeholder="كود الطالب">
-<select id="status">
-  <option value="تم">تم</option>
-  <option value="لم يتم">لم يتم</option>
-</select>
+  <input id="code" placeholder="كود الطالب">
 
-<button onclick="save()">حفظ</button>
+  <select id="status">
+    <option value="تم">تم</option>
+    <option value="لم يتم">لم يتم</option>
+  </select>
 
-<p id="msg"></p>
+  <button class="save" onclick="saveData()">إضافة / حفظ</button>
+  <button class="update" onclick="updateData()">تعديل الحالة</button>
+  <button class="delete" onclick="deleteData()">حذف الطالب</button>
+
+  <div id="msg"></div>
+</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import {
+  getDatabase,
+  ref,
+  set,
+  update,
+  remove
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-// 🔥 بياناتك أنت
+// 🔥 Firebase config (بتاعك)
 const firebaseConfig = {
   apiKey: "AIzaSyAt6ctdyQgA6yTO6QZGYyCZltO-ZTMEU5w",
   authDomain: "platform-499ca.firebaseapp.com",
@@ -34,13 +89,15 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-window.save = function(){
+let msg = document.getElementById("msg");
 
-  let code = document.getElementById("code").value;
+// ➤ إضافة / حفظ جديد
+window.saveData = function(){
+
+  let code = document.getElementById("code").value.trim();
   let status = document.getElementById("status").value;
-  let msg = document.getElementById("msg");
 
-  if(code === ""){
+  if(!code){
     msg.innerHTML = "اكتب الكود";
     return;
   }
@@ -50,6 +107,39 @@ window.save = function(){
   });
 
   msg.innerHTML = "تم الحفظ ✔";
+}
+
+// ➤ تعديل الحالة (تم / لم يتم)
+window.updateData = function(){
+
+  let code = document.getElementById("code").value.trim();
+  let status = document.getElementById("status").value;
+
+  if(!code){
+    msg.innerHTML = "اكتب الكود";
+    return;
+  }
+
+  update(ref(db, "students/" + code), {
+    status: status
+  });
+
+  msg.innerHTML = "تم التعديل ✔";
+}
+
+// ➤ حذف الطالب
+window.deleteData = function(){
+
+  let code = document.getElementById("code").value.trim();
+
+  if(!code){
+    msg.innerHTML = "اكتب الكود";
+    return;
+  }
+
+  remove(ref(db, "students/" + code));
+
+  msg.innerHTML = "تم الحذف 🗑️";
 }
 </script>
 
